@@ -2,6 +2,7 @@
 from django.db import models
 
 from base.models import BaseModel, GenericBaseModel, State
+from system_users.models import SUser
 
 class Fee(GenericBaseModel):
     """
@@ -14,7 +15,7 @@ class StudentFee(BaseModel):
     """
     Defines fees for students
     """
-    student = mod
+    student = models.ForeignKey(SUser, on_delete=models.CASCADE)
     fee = models.ForeignKey(Fee, on_delete=models.CASCADE)
     amount_paid = models.DecimalField(default=0.00, max_digits=25)
     balance = models.DecimalField(default=0.00, max_digits=25)

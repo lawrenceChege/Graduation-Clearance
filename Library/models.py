@@ -1,6 +1,7 @@
-from pydoc import synopsis
-from tkinter.tix import Balloon
 from django.db import models
+
+from system_users.models import SUser
+from ..Finance.models import Fee
 
 from base.models import BaseModel, GenericBaseModel, State
 
@@ -33,5 +34,12 @@ class Book(GenericBaseModel):
 
 
 class BoorowedBook(BaseModel):
+    student = models.ForeignKey(SUser, on_delete=models.CASCADE)
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    borrowed_time = models.DateTimeField(auto_now=True)
+    returned_time = models.DateTimeField(auto_now=True)
+    due_date = models.DateField(auto_now_add=True)
+    penalty = models.ForeignKey(Fee, on_delete=models.CASCADE)
+
     
 
