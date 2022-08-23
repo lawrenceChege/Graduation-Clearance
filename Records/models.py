@@ -15,7 +15,7 @@ class ResultSlip(BaseModel):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     unit = models.ForeignKey(Unit, on_delete=models.CASCADE)
     grade = models.TextField(max_length=2,  null=True, blank=True)
-    marks = models.IntegerField(max_length=2, null=True, blank=True)
+    marks = models.IntegerField(null=True, blank=True)
     status = models.ForeignKey(State, on_delete=models.CASCADE)
 
 class Certificate(BaseModel):

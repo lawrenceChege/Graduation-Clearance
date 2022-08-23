@@ -1,7 +1,7 @@
 from django.db import models
+from Finance.models import Fee
 
 from system_users.models import SUser
-from ..Finance.models import Fee
 
 from base.models import BaseModel, GenericBaseModel, State
 

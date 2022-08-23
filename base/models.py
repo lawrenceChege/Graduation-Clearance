@@ -43,28 +43,28 @@ class State(GenericBaseModel):
 		ordering = ('name',)
 		unique_together = ('name',)
 
-	# @classmethod
-	# def default_state(cls):
-	# 	"""
-	# The default Active state. Help in ensuring that the admin will be created without supplying the state at the
-	# command like.
-	# @return: The active state, if it exists, or create a new one if it doesn't exist.
-	# @rtype: str | None
-	# """
-	# 	# noinspection PyBroadException
-	#
-	# 	state = cls.objects.get(name='Active')
-	# 	return state.id
-	#
-	# @classmethod
-	# def disabled_state(cls):
-	# 	"""
-	# 	The default Disabled state. Help in ensuring that the admin will be created without supplying the state at the
-	# 	command like.
-	# 	@return: The active state, if it exists, or create a new one if it doesn't exist.
-	# 	@rtype: str | None
-	# 	"""
-	# 	# noinspection PyBroadException
-	#
-	# 	state = cls.objects.get(name='Disabled')
-	# 	return state
+	@classmethod
+	def default_state(cls):
+		"""
+	The default Active state. Help in ensuring that the admin will be created without supplying the state at the
+	command like.
+	@return: The active state, if it exists, or create a new one if it doesn't exist.
+	@rtype: str | None
+	"""
+		# noinspection PyBroadException
+	
+		state = cls.objects.get(name='Active')
+		return state.id
+	
+	@classmethod
+	def disabled_state(cls):
+		"""
+		The default Disabled state. Help in ensuring that the admin will be created without supplying the state at the
+		command like.
+		@return: The active state, if it exists, or create a new one if it doesn't exist.
+		@rtype: str | None
+		"""
+		# noinspection PyBroadException
+	
+		state = cls.objects.get(name='Disabled')
+		return state

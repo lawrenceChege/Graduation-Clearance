@@ -2,7 +2,7 @@
 	module for SUsers
 """
 
-from base.models import GenericBaseModel, State, BaseModel, SecurityQuestion
+from base.models import GenericBaseModel, State, BaseModel
 
 import unicodedata
 from django.contrib import auth
@@ -23,17 +23,15 @@ from django.contrib.auth.models import _user_get_permissions, _user_has_perm, _u
 
 from django.utils import timezone
 
-from corporate.models import Branch, Corporate, CheckoffBranch
-from SUser.backend.managers import SUserManager
+# from corporate.models import Branch, Corporate, CheckoffBranch
+from system_users.backend.managers import SUserManager
 
 
 class Role(GenericBaseModel):
 	"""
 		model for roles
 	"""
-	corporate = models.ForeignKey(Corporate, on_delete=models.CASCADE, null=True, blank=True)
-	is_corporate_role = models.BooleanField(default=False)
-	is_service_provider_role = models.BooleanField(default=False)
+	is_staff_role = models.BooleanField(default=False)
 	is_super_admin_role = models.BooleanField(default=False)
 	state = models.ForeignKey(State, default=State.default_state, on_delete=models.CASCADE)
 
@@ -41,7 +39,7 @@ class Role(GenericBaseModel):
 		return "%s" % self.name
 
 	def __repr__(self):
-		return f'Role_name={self.name},Is_corporate_role={self.is_corporate_role},Is_service_provider_role={self.is_service_provider_role},Is_super_admin={self.is_super_admin_role}'
+		return f'Role_name={self.name},Is_staff_role={self.is_staff_role},Is_service_provider_role={self.is_service_provider_role},Is_super_admin={self.is_super_admin_role}'
 
 	class Meta(object):
 		unique_together = ('name',)
@@ -53,8 +51,7 @@ class Permission(GenericBaseModel):
 	"""
 	parent = models.ForeignKey('self', blank=True, null=True, on_delete=models.CASCADE)
 	simple_name = models.TextField(max_length=255, blank=True, null=True)
-	extendable_by_corporate = models.BooleanField(default=False)
-	extendable_by_service_provider = models.BooleanField(default=False)
+	extendable = models.BooleanField(default=False)
 	state = models.ForeignKey(State, default=State.default_state, on_delete=models.CASCADE)
 
 	def __str__(self):
@@ -123,7 +120,7 @@ class SUserSecurityQuestion(BaseModel):
 		This model manages the users' security questions and security_question answers
 	"""
 	SUser = models.ForeignKey('SUser', related_name='user_questions',on_delete=models.CASCADE)
-	security_question = models.ForeignKey(SecurityQuestion, on_delete=models.CASCADE)
+	security_question = models.TextField(max_length=50)
 	state = models.ForeignKey(State, default=State.default_state, on_delete=models.CASCADE)
 	answer_hash = models.CharField(max_length=255)
 
@@ -206,16 +203,7 @@ class AbstractSUser(models.Model):
 		except Exception as e:
 			return e
 
-	@property
-	def security_questions(self):
-		"""Returns the 3 most recent active security questions for the user or None"""
-		# noinspection PyBroadException
-		try:
-			return SUserSecurityQuestion.objects.filter(SUser=self, state__name='Active').order_by(
-				'-date_created')[:3]  # Pick the most recent 3 active security questions.
-		except Exception as e:
-			return e
-
+	
 	# noinspection PyBroadException
 	def set_password(self, raw_password):
 		"""
@@ -237,54 +225,8 @@ class AbstractSUser(models.Model):
 		except Exception as e:
 			print('Exception: %s' % e)
 
-	# noinspection PyBroadException
-	def set_security_question(self, security_question, answer):
-		"""
-			Sets the security question for the user. If the user has more than 3 active security questions, we
-			deactivate the others so that we remain with only 3 active security questions.
-			@param security_question: The security question we are setting.
-			@type security_question: SecurityQuestion
-			@param answer: The security question answer provided by the user.
-			@type answer: str
-			@return: The created e user security question or None on error.
-			@rtype: SUserSecurityQuestion | None
-		"""
-		try:
-			self.save()  # Save our current model
-			pass_update = SUserSecurityQuestion.objects.create(
-				SUser=self, security_question=security_question, answer_hash=make_password(answer),
-				state_id=State.default_state())
-			if pass_update is not None:
-				SUserSecurityQuestion.objects.filter(
-					~Q(id__in=SUserSecurityQuestion.objects.filter(
-						state__name='Active').order_by('-date_created').values_list(
-						'id', flat=True)[:3])).update(state=State.disabled_state())
-				return pass_update
-		except Exception as e:
-			print('set_security_question Exception: %s' % e)
-		return None
-
-	# noinspection PyBroadException
-	def check_security_question(self, security_question, answer):
-		"""
-		Sets the security question for the user. If the user has more than 3 active security questions, we
-		deactivate the others so that we remain with only 3 active security questions.
-		@param security_question: The security question we are setting.
-		@type security_question: SecurityQuestion
-		@param answer: The security question answer provided by the user.
-		@type answer: str
-		@return: True if the answer is correct, False otherwise.
-		@rtype: bool
-		"""
-		try:
-			question = SUserSecurityQuestion.objects.filter(
-				SUser=self, security_question=security_question, state__name='Active')
-			if question:
-				if check_password(answer, question.answer_hash):
-					return True
-		except Exception as e:
-			print('check_security_question Exception: %s' % e)
-		return False
+	
+	
 
 	def check_password(self, raw_password):
 		"""
@@ -343,27 +285,18 @@ class SUser(BaseModel, AbstractSUser):
 	"""
 	The class that manages User data for access and association with corporates.
 	"""
-	branch = models.ForeignKey(
-		Branch, related_name='branches', null=True, blank=True,
-		help_text='The branch the user belongs to. Cannot be null unless super user', on_delete=models.CASCADE)
-	checkoff_branch = models.ForeignKey(
-		CheckoffBranch, related_name='checkoff_branches', null=True, blank=True,
-		help_text='The branch the user belongs to. Cannot be null unless super user', on_delete=models.CASCADE)
 	username = models.CharField(
 		max_length=50, unique=True,
 		help_text='System-wide identifier used to identify the admin for authentication')
 	first_name = models.CharField(max_length=100, null=True, blank=True)
 	last_name = models.CharField(max_length=100, null=True, blank=True)
-	other_name = models.CharField(max_length=100, null=True, blank=True)
 	phone_number = models.CharField(_('phone number'), max_length=20)
 	email = models.CharField(max_length=50)
-	security_code = models.CharField(max_length=150, null=True, blank=True)
 	state = models.ForeignKey(State, default=State.default_state,on_delete=models.CASCADE)
 	is_active = models.BooleanField(_('active'), default=True, help_text='User is currently active.')
 	is_staff = models.BooleanField(_('staff'), default=False, help_text='User can login login to the dashboard.')
 	is_superuser = models.BooleanField(
 		_('super user'), default=False, help_text='User has full permissions on the admin dashboard.')
-	language_code = models.CharField(max_length=5, default='en')
 	last_activity = models.DateTimeField(_('last activity'), null=True, blank=True, editable=False)
 	role = models.ForeignKey(
 		Role, related_name='roles', null=True, blank=True,

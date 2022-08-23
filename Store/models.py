@@ -26,6 +26,16 @@ class BorrowedGown(BaseModel):
     gown = models.ForeignKey(GraduationGown, on_delete=models.CASCADE)
     borrow_date = models.DateField(auto_now=True)
     retrun_date = models.DateField(auto_now=True)
-    penalty = models.DecimalField(max_length=20,  null=True, blank=True)
-    balance = models.DecimalField(max_length=20,  null=True, blank=True)
+    penalty = models.DecimalField(max_digits=25, decimal_places=2, null=True, blank=True)
+    balance = models.DecimalField(max_digits=25, decimal_places=2,  null=True, blank=True)
+    status = models.ForeignKey(State, on_delete=models.CASCADE)
+
+class BorrowedGownPenalty(BaseModel):
+    """
+	Defines the graduation gown borrowed
+	"""
+    student = models.ForeignKey(SUser, on_delete=models.CASCADE)
+    gown = models.ForeignKey(GraduationGown, on_delete=models.CASCADE)
+    penalty = models.DecimalField(max_digits=25, decimal_places=2, null=True, blank=True)
+    balance = models.DecimalField(max_digits=25, decimal_places=2, null=True, blank=True)
     status = models.ForeignKey(State, on_delete=models.CASCADE)

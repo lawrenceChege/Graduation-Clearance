@@ -1,10 +1,10 @@
 """
 The model managers.
 """
-from django.contrib.auth.base_user import BasSUserManager
+from django.contrib.auth.base_user import BaseUserManager
 
 
-class SUserManager(BasSUserManager):
+class SUserManager(BaseUserManager):
 	"""
 	The E user manager
 	"""
