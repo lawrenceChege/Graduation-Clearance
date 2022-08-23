@@ -9,12 +9,20 @@ class Programme(GenericBaseModel):
 	"""
     status = models.ForeignKey(State, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return '%s %s' % (self.name, self.status)
+
+
 
 class Faculty(GenericBaseModel):
     """
 	Defines the Differnt Schools
 	"""
     status = models.ForeignKey(State, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return '%s %s' % (self.name, self.status)
+
 
 class Department(GenericBaseModel):
     """
@@ -23,6 +31,11 @@ class Department(GenericBaseModel):
     faculty = models.ForeignKey(Faculty, on_delete=models.CASCADE)
     status = models.ForeignKey(State, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return '%s %s %s' % (self.name, self.faculty, self.status)
+
+    
+
 class HeadOfDepartment(BaseModel):
     """
 	Defines the head of a department
@@ -30,6 +43,11 @@ class HeadOfDepartment(BaseModel):
     department = models.ForeignKey(Department, on_delete=models.CASCADE)
     head = models.ForeignKey(SUser, on_delete=models.CASCADE)
     status = models.ForeignKey(State, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return '%s %s %s' % (self.department, self.head, self.status)
+
+    
 	
 
 class Course(GenericBaseModel):
@@ -43,6 +61,12 @@ class Course(GenericBaseModel):
     no_of_semesters = models.IntegerField(default=0)
     minimum_requirement = models.TextField(blank=True, null=True)
     fees = models.DecimalField(default=0.00, decimal_places=2, max_digits=25)
+    status = models.ForeignKey(State, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return '%s %s %s %s %s' % (self.department, self.level, self.no_of_years, self.no_of_semesters, self.status)
+
+    
 
 
 class Unit(GenericBaseModel):
@@ -50,3 +74,8 @@ class Unit(GenericBaseModel):
     Defines the different units
     """
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    
+    status = models.ForeignKey(State, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return '%s %s %s' % (self.name, self.course, self.status)

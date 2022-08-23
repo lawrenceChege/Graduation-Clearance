@@ -11,30 +11,24 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('base', '0001_initial'),
+        ('Faculty', '0001_initial'),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Course',
+            name='Certificate',
             fields=[
                 ('synced', models.BooleanField(default=False)),
                 ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, unique=True)),
                 ('date_modified', models.DateTimeField(auto_now=True)),
                 ('date_created', models.DateTimeField(auto_now_add=True)),
-                ('name', models.CharField(max_length=35)),
-                ('description', models.TextField(blank=True, max_length=255, null=True)),
-                ('program_goal', models.TextField(blank=True, null=True)),
-                ('no_of_years', models.IntegerField(default=0)),
-                ('no_of_semesters', models.IntegerField(default=0)),
-                ('minimum_requirement', models.TextField(blank=True, null=True)),
-                ('fees', models.DecimalField(decimal_places=2, default=0.0, max_digits=25)),
             ],
             options={
                 'abstract': False,
             },
         ),
         migrations.CreateModel(
-            name='Department',
+            name='Distinction',
             fields=[
                 ('synced', models.BooleanField(default=False)),
                 ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, unique=True)),
@@ -42,13 +36,15 @@ class Migration(migrations.Migration):
                 ('date_created', models.DateTimeField(auto_now_add=True)),
                 ('name', models.CharField(max_length=35)),
                 ('description', models.TextField(blank=True, max_length=255, null=True)),
+                ('upper_gpa', models.IntegerField(blank=True, null=True)),
+                ('lower_gpa', models.IntegerField(blank=True, null=True)),
             ],
             options={
                 'abstract': False,
             },
         ),
         migrations.CreateModel(
-            name='Faculty',
+            name='Grade',
             fields=[
                 ('synced', models.BooleanField(default=False)),
                 ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, unique=True)),
@@ -56,50 +52,24 @@ class Migration(migrations.Migration):
                 ('date_created', models.DateTimeField(auto_now_add=True)),
                 ('name', models.CharField(max_length=35)),
                 ('description', models.TextField(blank=True, max_length=255, null=True)),
+                ('upper_marks', models.IntegerField(blank=True, null=True)),
+                ('lower_marks', models.IntegerField(blank=True, null=True)),
             ],
             options={
                 'abstract': False,
             },
         ),
         migrations.CreateModel(
-            name='Unit',
+            name='ResultSlip',
             fields=[
                 ('synced', models.BooleanField(default=False)),
                 ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, unique=True)),
                 ('date_modified', models.DateTimeField(auto_now=True)),
                 ('date_created', models.DateTimeField(auto_now_add=True)),
-                ('name', models.CharField(max_length=35)),
-                ('description', models.TextField(blank=True, max_length=255, null=True)),
+                ('marks', models.IntegerField(blank=True, null=True)),
                 ('course', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='Faculty.course')),
+                ('grade', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='Records.grade')),
                 ('status', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.state')),
-            ],
-            options={
-                'abstract': False,
-            },
-        ),
-        migrations.CreateModel(
-            name='Programme',
-            fields=[
-                ('synced', models.BooleanField(default=False)),
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, unique=True)),
-                ('date_modified', models.DateTimeField(auto_now=True)),
-                ('date_created', models.DateTimeField(auto_now_add=True)),
-                ('name', models.CharField(max_length=35)),
-                ('description', models.TextField(blank=True, max_length=255, null=True)),
-                ('status', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.state')),
-            ],
-            options={
-                'abstract': False,
-            },
-        ),
-        migrations.CreateModel(
-            name='HeadOfDepartment',
-            fields=[
-                ('synced', models.BooleanField(default=False)),
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, unique=True)),
-                ('date_modified', models.DateTimeField(auto_now=True)),
-                ('date_created', models.DateTimeField(auto_now_add=True)),
-                ('department', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='Faculty.department')),
             ],
             options={
                 'abstract': False,

@@ -18,6 +18,9 @@ class GraduationGown(BaseModel):
     fee = models.ForeignKey(Fee, on_delete=models.CASCADE)
     status = models.ForeignKey(State, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return '%s %s' % (self.size, self.programme)
+
 class BorrowedGown(BaseModel):
     """
 	Defines the graduation gown borrowed
@@ -25,10 +28,13 @@ class BorrowedGown(BaseModel):
     student = models.ForeignKey(SUser, on_delete=models.CASCADE)
     gown = models.ForeignKey(GraduationGown, on_delete=models.CASCADE)
     borrow_date = models.DateField(auto_now=True)
-    retrun_date = models.DateField(auto_now=True)
+    return_date = models.DateField(auto_now=True)
     penalty = models.DecimalField(max_digits=25, decimal_places=2, null=True, blank=True)
     balance = models.DecimalField(max_digits=25, decimal_places=2,  null=True, blank=True)
     status = models.ForeignKey(State, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return '%s %s %s %s' % (self.student, self.borrow_date, self.retrun_date, self.status)
 
 class BorrowedGownPenalty(BaseModel):
     """
@@ -39,3 +45,6 @@ class BorrowedGownPenalty(BaseModel):
     penalty = models.DecimalField(max_digits=25, decimal_places=2, null=True, blank=True)
     balance = models.DecimalField(max_digits=25, decimal_places=2, null=True, blank=True)
     status = models.ForeignKey(State, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return '%s %s %s' % (self.student, self.penalty, self.status)

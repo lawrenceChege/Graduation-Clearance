@@ -11,17 +11,27 @@ class Category(GenericBaseModel):
 	"""
     status = models.ForeignKey(State, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return '%s %s' % (self.name, self.status)
+
+
 class Author(GenericBaseModel):
     """
 	Defines the Author
 	"""
     status = models.ForeignKey(State, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return '%s %s' % (self.name, self.status)
+
 class Publisher(GenericBaseModel):
     """
 	Defines the publisher
 	"""
     status = models.ForeignKey(State, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return '%s %s' % (self.name, self.status)
 
 class Book(GenericBaseModel):
     """
@@ -31,6 +41,10 @@ class Book(GenericBaseModel):
     publisher = models.ForeignKey(Publisher, on_delete=models.CASCADE)
     year_published = models.TextField(max_length=4, blank=True, null=True)
     synopsis = models.TextField(max_length=500, blank=True, null=True)
+    status = models.ForeignKey(State, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return '%s %s %s %s' % (self.name, self.author , self.publisher, self.year_published , self.status)
 
 
 class BoorowedBook(BaseModel):
@@ -40,6 +54,10 @@ class BoorowedBook(BaseModel):
     returned_time = models.DateTimeField(auto_now=True)
     due_date = models.DateField(auto_now_add=True)
     penalty = models.ForeignKey(Fee, on_delete=models.CASCADE)
+    status = models.ForeignKey(State, on_delete=models.CASCADE)
+    
+    def __str__(self):
+        return '%s %s %s %s %s' % (self.student, self.book, self.borrowed_time, self.due_date, self.status)
 
     
 
